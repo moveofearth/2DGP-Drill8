@@ -1,5 +1,5 @@
 from pico2d import load_image, get_time
-from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT
+from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT, SDLK_a
 import state_machine
 
 from state_machine import StateMachine
@@ -95,16 +95,14 @@ class AutoRun:
 
         if self.boy.face_dir == 1:
             self.boy.x = min(self.boy.x + 10, 780)
-            self.boy.face_dir = -1
         else:
             self.boy.x = max(self.boy.x - 10, 20)
-            self.boy.face_dir = 1
 
     def draw(self):
         if self.boy.face_dir == 1:  # right
-            self.boy.image.clip_draw(self.boy.frame * 100, 100, 100, 100, self.boy.x, self.boy.y)
+            self.boy.image.clip_draw(self.boy.frame * 100, 100, 100, 100, self.boy.x, self.boy.y, 300, 300)
         else:  # face_dir == -1: # left
-            self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y)
+            self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y, 300, 300)
 
 
 
@@ -114,6 +112,9 @@ def space_down(e):
 
 def time_out(e):
     return e[0] == 'TIME_OUT'
+
+def auto_run_over(e):
+    return e[0] == 'AUTO_RUN_OVER'
 
 
 # == time_out = lambda e : e[0] == 'TIME_OUT'
@@ -130,6 +131,12 @@ def left_down(e):
 def left_up(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_LEFT
 
+def a_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_a
+
+def a_up(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_a
+
 
 class Boy:
     def __init__(self):
@@ -142,12 +149,14 @@ class Boy:
         self.IDLE = Idle(self)
         self.SLEEP = Sleep(self)
         self.RUN = Run(self)
+        self.AUTO_RUN = AutoRun(self)
         self.state_machine = StateMachine(
-            self.IDLE,
+            self.AUTO_RUN,
             {
                 self.SLEEP: {space_down: self.IDLE},
                 self.IDLE: {time_out: self.SLEEP, right_down: self.RUN, left_down: self.RUN, left_up: self.RUN, right_up: self.RUN},
-                self.RUN: {right_up: self.IDLE, left_up: self.IDLE, left_down: self.IDLE, right_down: self.IDLE}
+                self.RUN: {right_up: self.IDLE, left_up: self.IDLE, left_down: self.IDLE, right_down: self.IDLE},
+                self.AUTO_RUN: {}
             }
         )
 
