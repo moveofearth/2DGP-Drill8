@@ -1,5 +1,6 @@
 from pico2d import load_image, get_time
 from sdl2 import SDL_KEYDOWN, SDLK_SPACE, SDLK_RIGHT, SDL_KEYUP, SDLK_LEFT
+import state_machine
 
 from state_machine import StateMachine
 
@@ -47,6 +48,13 @@ class Sleep:
             self.boy.image.clip_composite_draw(self.boy.frame * 100, 200, 100, 100, -3.141592 / 2, '', self.boy.x,
                                                self.y - 25, 100, 100)
 
+def space_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
+
+def time_out(e):
+    return e == 'TIME_OUT'
+
+# == time_out = lambda e : e[0] == 'TIME_OUT'
 
 class Boy:
     def __init__(self):
@@ -57,7 +65,14 @@ class Boy:
         self.image = load_image('animation_sheet.png')
 
         self.IDLE = Idle(self)
-        self.state_machine = StateMachine(self.IDLE)
+        self.SLEEP = Sleep(self)
+        self.state_machine = StateMachine(
+            self.SLEEP,
+            {
+                self.SLEEP : {space_down: self.IDLE},
+                self.IDLE : {time_out: self.SLEEP},
+            }
+        )
 
     def update(self):
         self.state_machine.update()
@@ -65,3 +80,6 @@ class Boy:
 
     def draw(self):
         self.state_machine.draw()
+
+    def handle_event(self, event):
+        self.state_machine.handle_state_event(('INPUT', event))
