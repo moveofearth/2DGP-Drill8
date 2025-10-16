@@ -157,7 +157,7 @@ class Boy:
         self.RUN = Run(self)
         self.AUTO_RUN = AutoRun(self)
         self.state_machine = StateMachine(
-            self.AUTO_RUN,
+            self.IDLE,
             {
                 self.SLEEP: {space_down: self.IDLE},
                 self.IDLE: {time_out: self.SLEEP, right_down: self.RUN, left_down: self.RUN, left_up: self.RUN, right_up: self.RUN},
