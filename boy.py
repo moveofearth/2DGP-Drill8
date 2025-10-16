@@ -13,7 +13,7 @@ class Idle:
     def enter(self, e):
         self.boy.wait_start_time = get_time()
 
-    def exit(self):
+    def exit(self, e):
         pass
 
     def do(self):
@@ -35,7 +35,7 @@ class Sleep:
     def enter(self, e):
         self.boy.dir = 0
 
-    def exit(self):
+    def exit(self, e):
         pass
 
     def do(self):
@@ -113,8 +113,8 @@ class Boy:
             self.IDLE,
             {
                 self.SLEEP: {space_down: self.IDLE},
-                self.IDLE: {time_out: self.SLEEP, right_down: self.RUN, left_down: self.RUN},
-                self.RUN: {right_up: self.IDLE, left_up: self.IDLE}
+                self.IDLE: {time_out: self.SLEEP, right_down: self.RUN, left_down: self.RUN, left_up: self.RUN, right_up: self.RUN},
+                self.RUN: {right_up: self.IDLE, left_up: self.IDLE, left_down: self.IDLE, right_down: self.IDLE}
             }
         )
 
