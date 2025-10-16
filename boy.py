@@ -93,16 +93,22 @@ class AutoRun:
         if get_time() - self.boy.run_start_time > 5:
             self.boy.state_machine.handle_state_event(('AUTO_RUN_OVER', None))
 
-        if self.boy.face_dir == 1:
-            self.boy.x = min(self.boy.x + 10, 780)
+        if self.boy.dir == 1:
+            self.boy.x += self.boy.dir * 10
+            if self.boy.x >= 780:
+                self.boy.dir = -1
+                self.boy.face_dir = -1
         else:
-            self.boy.x = max(self.boy.x - 10, 20)
+            self.boy.x += self.boy.dir * 10
+            if self.boy.x <= 20:
+                self.boy.dir = 1
+                self.boy.face_dir = 1
 
     def draw(self):
         if self.boy.face_dir == 1:  # right
-            self.boy.image.clip_draw(self.boy.frame * 100, 100, 100, 100, self.boy.x, self.boy.y, 300, 300)
+            self.boy.image.clip_draw(self.boy.frame * 100, 100, 100, 100, self.boy.x, self.boy.y + 50, 300, 300)
         else:  # face_dir == -1: # left
-            self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y, 300, 300)
+            self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y + 50, 300, 300)
 
 
 
