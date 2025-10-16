@@ -18,7 +18,7 @@ class Idle:
 
     def do(self):
         self.boy.frame = (self.boy.frame + 1) % 8
-        if get_time() - self.boy.wait_start_time > 100:
+        if get_time() - self.boy.wait_start_time > 5:
             self.boy.state_machine.handle_state_event(('TIME_OUT', None))
 
     def draw(self):
