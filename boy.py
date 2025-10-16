@@ -66,7 +66,14 @@ class Run:
 
     def do(self):
         self.boy.frame = (self.boy.frame + 1) % 8
-        self.boy.x += self.boy.dir * 5
+
+        if self.boy.dir == 1:
+            if self.boy.x < 780:
+                self.boy.x += self.boy.dir * 5
+        elif self.boy.dir == -1:
+            if self.boy.x > 20:
+                self.boy.x += self.boy.dir * 5
+
 
     def draw(self):
         if self.boy.face_dir == 1:  # right
@@ -81,6 +88,7 @@ class AutoRun:
 
     def enter(self, e):
         self.boy.dir = 1
+        self.boy.face_dir = 1
         self.boy.run_start_time = get_time()
         pass
 
@@ -94,12 +102,12 @@ class AutoRun:
             self.boy.state_machine.handle_state_event(('AUTO_RUN_OVER', None))
 
         if self.boy.dir == 1:
-            self.boy.x += self.boy.dir * 10
+            self.boy.x += self.boy.dir * 20
             if self.boy.x >= 780:
                 self.boy.dir = -1
                 self.boy.face_dir = -1
         else:
-            self.boy.x += self.boy.dir * 10
+            self.boy.x += self.boy.dir * 20
             if self.boy.x <= 20:
                 self.boy.dir = 1
                 self.boy.face_dir = 1
@@ -159,10 +167,18 @@ class Boy:
         self.state_machine = StateMachine(
             self.IDLE,
             {
+
                 self.SLEEP: {space_down: self.IDLE},
-                self.IDLE: {time_out: self.SLEEP, right_down: self.RUN, left_down: self.RUN, left_up: self.RUN, right_up: self.RUN},
-                self.RUN: {right_up: self.IDLE, left_up: self.IDLE, left_down: self.IDLE, right_down: self.IDLE},
-                self.AUTO_RUN: {}
+
+                self.IDLE: {time_out: self.SLEEP, right_down: self.RUN, left_down: self.RUN, left_up: self.RUN, right_up: self.RUN
+                            , a_down: self.AUTO_RUN},
+
+                self.RUN: {right_up: self.IDLE, left_up: self.IDLE, left_down: self.IDLE, right_down: self.IDLE
+                           , auto_run_over: self.IDLE},
+
+                self.AUTO_RUN: {auto_run_over: self.IDLE
+                    , left_down: self.RUN, right_down: self.RUN, left_up: self.IDLE, right_up: self.IDLE}
+
             }
         )
 
