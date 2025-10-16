@@ -75,6 +75,39 @@ class Run:
             self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y)
 
 
+class AutoRun:
+    def __init__(self, boy):
+        self.boy = boy
+
+    def enter(self, e):
+        self.boy.dir = 1
+        self.boy.run_start_time = get_time()
+        pass
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        self.boy.frame = (self.boy.frame + 1) % 8
+
+        if get_time() - self.boy.run_start_time > 5:
+            self.boy.state_machine.handle_state_event(('AUTO_RUN_OVER', None))
+
+        if self.boy.face_dir == 1:
+            self.boy.x = min(self.boy.x + 10, 780)
+            self.boy.face_dir = -1
+        else:
+            self.boy.x = max(self.boy.x - 10, 20)
+            self.boy.face_dir = 1
+
+    def draw(self):
+        if self.boy.face_dir == 1:  # right
+            self.boy.image.clip_draw(self.boy.frame * 100, 100, 100, 100, self.boy.x, self.boy.y)
+        else:  # face_dir == -1: # left
+            self.boy.image.clip_draw(self.boy.frame * 100, 0, 100, 100, self.boy.x, self.boy.y)
+
+
+
 def space_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
 
