@@ -11,14 +11,14 @@ class Idle:
         self.boy = boy
 
     def enter(self):
-        self.boy.wait_time = get_time()
+        self.boy.wait_start_time = get_time()
 
     def exit(self):
         pass
 
     def do(self):
         self.boy.frame = (self.boy.frame + 1) % 8
-        if get_time() - self.boy.wait_time > 2:
+        if get_time() - self.boy.wait_start_time > 2:
             self.boy.state_machine.handle_state_event(('TIME_OUT', None))
 
     def draw(self):
@@ -63,6 +63,18 @@ def time_out(e):
 
 
 # == time_out = lambda e : e[0] == 'TIME_OUT'
+
+def right_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_RIGHT
+
+def right_up(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_RIGHT
+
+def left_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_LEFT
+
+def left_up(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYUP and e[1].key == SDLK_LEFT
 
 
 class Boy:
