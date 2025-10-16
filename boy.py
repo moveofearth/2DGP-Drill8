@@ -11,18 +11,20 @@ class Idle:
         self.boy = boy
 
     def enter(self):
-        self.boy.dir = 0
+        self.boy.wait_time = get_time()
 
     def exit(self):
         pass
 
     def do(self):
         self.boy.frame = (self.boy.frame + 1) % 8
+        if get_time() - self.boy.wait_time > 2:
+            self.boy.state_machine.handle_state_event(('TIME_OUT', None))
 
     def draw(self):
-        if self.boy.face_dir == 1: # right
+        if self.boy.face_dir == 1:  # right
             self.boy.image.clip_draw(self.boy.frame * 100, 300, 100, 100, self.boy.x, self.boy.y)
-        else: # face_dir == -1: # left
+        else:  # face_dir == -1: # left
             self.boy.image.clip_draw(self.boy.frame * 100, 200, 100, 100, self.boy.x, self.boy.y)
 
 
@@ -42,19 +44,26 @@ class Sleep:
 
     def draw(self):
         if self.boy.face_dir == 1:
-            self.boy.image.clip_composite_draw(self.boy.frame * 100, 300, 100, 100, 3.141592 / 2, '', self.boy.x,
-                                               self.boy.y - 25, 100, 100)
+            self.boy.image.clip_composite_draw(self.boy.frame * 100, 300, 100, 100, 3.141592 / 2, '',
+                                               self.boy.x - 25, self.boy.y - 25, 100, 100)
         else:
-            self.boy.image.clip_composite_draw(self.boy.frame * 100, 200, 100, 100, -3.141592 / 2, '', self.boy.x,
-                                               self.y - 25, 100, 100)
+            self.boy.image.clip_composite_draw(self.boy.frame * 100, 200, 100, 100, -3.141592 / 2, '',
+                                                   self.boy.x + 25, self.y - 25, 100, 100)
+
+
+
+
 
 def space_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
 
+
 def time_out(e):
-    return e == 'TIME_OUT'
+    return e[0] == 'TIME_OUT'
+
 
 # == time_out = lambda e : e[0] == 'TIME_OUT'
+
 
 class Boy:
     def __init__(self):
@@ -69,14 +78,13 @@ class Boy:
         self.state_machine = StateMachine(
             self.SLEEP,
             {
-                self.SLEEP : {space_down: self.IDLE},
-                self.IDLE : {time_out: self.SLEEP},
+                self.SLEEP: {space_down: self.IDLE},
+                self.IDLE: {time_out: self.SLEEP},
             }
         )
 
     def update(self):
         self.state_machine.update()
-
 
     def draw(self):
         self.state_machine.draw()
